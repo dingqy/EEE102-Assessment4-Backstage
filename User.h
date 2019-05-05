@@ -11,13 +11,18 @@ protected:
 	string name;
 	string gender;
 	int permission;
+	
 public:
 	User() = default;
 	User(int id, string name, string gender);
 	int getId();
 	string getName();
 	string getGender();
+	void setId(int id);
+	void setName(string name);
+	void setGender(string gender);
 	int getPermission();
+	bool empty = true;
 };
 
 class Admin : public User {

@@ -1,10 +1,11 @@
 #include "Book.h"
 
-Book::Book(string name, string author, string publisher, int bookId) {
+Book::Book(string name, string author, string publisher, int bookId, string bookCondition) {
 	this->name = name;
 	this->author = author;
 	this->publisher = publisher;
 	this->bookId = bookId;
+	this->bookCondition = bookCondition;
 }
 
 Book::Book(string name, string isbn, string author, string publisher, int bookId, string bookCondition, string warehousingTime, string borrowTime) {

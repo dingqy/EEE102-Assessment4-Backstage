@@ -7,7 +7,6 @@
 #include "sqlite3.h"
 #include "User.h"
 #include "Book.h"
-#include "SearchType.h"
 using namespace std;
 
 #ifndef ASSESSMENT4_console
@@ -20,7 +19,7 @@ public:
 	Console();
 	User login(string username, string password);
 	vector<Book> searchBook(map<string, string> type);
-	vector<User> searchUser(SearchType temp);
+	//vector<User> searchUser(SearchType temp);
 	bool addBook(Book book);
 	bool addUser(User user);
 	bool updateUser(User user);
