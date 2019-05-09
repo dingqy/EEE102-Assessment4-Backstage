@@ -7,6 +7,13 @@ Library Management System
 Visual Studio 2019
 
 ## Update
+### Version 0.2.0
+#### Date: 2019 / 05 / 09
+* Fix some bugs and simplify some code
+* searchBook() support vague name search
+* The person who borrow the book can be recoreded as borrowId in the database
+* The returnTime can be recoreded as dueTime in the database
+
 ### Version 0.1.0
 #### Date: 2019 / 05 / 05
 * Achieve login function

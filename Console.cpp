@@ -2,10 +2,8 @@
 
 //Execute the sql sentences
 bool sqlExecute(string sqlTemp, sqlite3* db) {
-	char sql[200];
-	strcpy_s(sql, sqlTemp.c_str());
 	char* zErrMsg = 0;
-	int res = sqlite3_exec(db, sql, 0, 0, &zErrMsg);
+	int res = sqlite3_exec(db, sqlTemp.c_str(), 0, 0, &zErrMsg);
 	if (res == SQLITE_OK) {
 		cout << "success";
 		return true;
@@ -14,6 +12,24 @@ bool sqlExecute(string sqlTemp, sqlite3* db) {
 		sqlite3_free(zErrMsg);
 		return false;
 	}
+}
+
+//Get specfic dates
+string getTime() {
+	//%H:%M:%S	
+	time_t second;
+	time(&second);
+
+	tm localTm;
+	localtime_s(&localTm, &second);
+
+	localTm.tm_mon += 1;
+	localTm.tm_mday = 28;
+
+	char localTimeStr[128] = { 0 };
+	strftime(localTimeStr, sizeof(localTimeStr), "%F", &localTm);
+
+	return localTimeStr;
 }
 
 //Open the sqlite3
@@ -26,6 +42,7 @@ Console::Console() {
 	}
 }
 
+//Login the system
 User Console::login(string username, string password) {
 	ostringstream ostr1;
 	ostr1 << "SELECT Id, Name, Gender FROM User WHERE " << "Username = '" << username << "' AND Password = '" << password << "';";
@@ -58,18 +75,18 @@ User Console::login(string username, string password) {
 	return Admin(id, name, gender);
 }
 
-//Search the books from database
+//Search the books from database (Name should be the first)
 vector<Book> Console::searchBook(map<string, string> type) {
 	vector<Book> result;
 	ostringstream ostr1;
-	ostr1 << "SELECT Name, Author, Publisher, BookId, BookCondition FROM Book";
+	ostr1 << "SELECT Name, Author, Publisher, BookId, BookCondition, dueTime FROM Book";
 	if (!type.empty()) {
 		ostr1 << " WHERE";
 		map<string, string>::iterator iter = type.begin();
-		ostr1 << " " << iter->first << " = '" << iter->second;
+		ostr1 << " " << iter->first << " LIKE '%" << iter->second << "%";
 		iter ++;
 		while (iter != type.end()) {
-			ostr1 << "', " << iter->first << " = '" << iter->second;
+			ostr1 << "'AND " << iter->first << " = '" << iter->second;
 			iter ++;
 		}
 		ostr1 << "';";
@@ -79,6 +96,7 @@ vector<Book> Console::searchBook(map<string, string> type) {
 	string publisher;
 	int bookId;
 	string bookCondition;
+	string dueTime;
 	string temp = ostr1.str();
 	char* errmsg;
 	char** pResult;
@@ -103,7 +121,9 @@ vector<Book> Console::searchBook(map<string, string> type) {
 		index++;
 		bookCondition = pResult[index];
 		index++;
-		result.push_back(Book(name, author, publisher, bookId, bookCondition));
+		dueTime = pResult[index];
+		index++;
+		result.push_back(Book(name, author, publisher, bookId, bookCondition, dueTime));
 	}
 	return result;
 }
@@ -113,25 +133,24 @@ bool Console::addBook(Book book) {
 	ostringstream ostr1;
 	ostr1 << "INSERT INTO BOOK VALUES ('" << book.getName() << "', '"
 		<< book.getAuthor() << "', '" << book.getPublisher() << "', " << book.getBookId() << ", '"
-		<< book.getBookCondition() << "');";
-	string temp = ostr1.str();
-	return sqlExecute(temp, db);
+		<< book.getBookCondition() << "', 0, '0');";
+	return sqlExecute(ostr1.str(), db);
 }
 
+//Add the user to the database
 bool Console::addUser(User user) {
 	ostringstream ostr1;
 	ostr1 << "INSERT INTO User VALUES (" << user.getId() << ", '"
 		<< user.getName() << "', '" << user.getGender() << "');";
-	string temp = ostr1.str();
-	return sqlExecute(temp, db);
+	return sqlExecute(ostr1.str(), db);
 }
 
+//Update the user in the database
 bool Console::updateUser(User user) {
 	ostringstream ostr1;
 	ostr1 << "UPDATE User SET Id =  " << user.getId() << ", Name = '"
 		<< user.getName() << "', Gender = '" << user.getGender() << "' WHERE Id = " << user.getId() << ";";
-	string temp = ostr1.str();
-	return sqlExecute(temp, db);
+	return sqlExecute(ostr1.str(), db);
 }
 
 //Update the book in the database
@@ -139,11 +158,10 @@ bool Console::updateBook(Book book) {
 	ostringstream ostr1;
 	ostr1 << "UPDATE Book SET Name =  '" << book.getName() << "', Author = '" 
 		<< book.getAuthor() << "', Publisher = '" << book.getPublisher() << "' WHERE bookId = " << book.getBookId() << ";";
-	string temp = ostr1.str();
-	return sqlExecute(temp, db);
+	return sqlExecute(ostr1.str(), db);
 }
 
-//User borrow the book
+//User borrow the book (dueTime was next month 28)
 bool Console::borrowBook(Book book, User user) {
 	ostringstream ostr1;
 	ostr1 << "SELECT * FROM Book WHERE BookId = " << book.getBookId() << " AND BookCondition = '" << "Stored';";
@@ -162,12 +180,11 @@ bool Console::borrowBook(Book book, User user) {
 		return false;
 	}
 	ostr1.str("");
-	ostr1 << "UPDATE Book SET bookCondition =  'On loan-due' WHERE bookId = " << book.getBookId() << ";";
-	string temp = ostr1.str();  //can be changed
-	return sqlExecute(temp, db);
+	ostr1 << "UPDATE Book SET bookCondition =  'On loan-due', borrowId = "<< user.getId() << ", dueTime = '" << getTime() << "' WHERE bookId = " << book.getBookId() << ";";
+	return sqlExecute(ostr1.str(), db);
 }
 
-bool Console::returnBook(Book book, User user) {
+bool Console::returnBook(Book book) {
 	ostringstream ostr1;
 	ostr1 << "SELECT * FROM Book WHERE BookId = " << book.getBookId() << " AND BookCondition = '" << "On loan-due';";
 	char* errmsg;
@@ -185,8 +202,12 @@ bool Console::returnBook(Book book, User user) {
 		return false;
 	}
 	ostr1.str("");
-	ostr1 << "UPDATE Book SET bookCondition =  'Stored' WHERE bookId = " << book.getBookId() << ";";
-	string temp = ostr1.str();  //can be changed
-	return sqlExecute(temp, db);
+	ostr1 << "UPDATE Book SET bookCondition =  'Stored', borrowId = 0, dueTime = '0' WHERE bookId = " << book.getBookId() << ";";
+	return sqlExecute(ostr1.str(), db);
+}
+
+//Exit the system
+void Console::exit() {
+	sqlite3_close(db);
 }
 

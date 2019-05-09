@@ -16,7 +16,7 @@ private:
 	string warehousingTime;
 	string borrowTime;
 public:
-	Book(string name, string author, string publisher, int bookId, string bookCondition);
+	Book(string name, string author, string publisher, int bookId, string bookCondition, string dueTime);
 	Book(string name, string isbn, string author, string publisher, int bookId, string bookCondition, string warehousingTime, string borrowTime);
 	string getName();
 	string getIsbn();
