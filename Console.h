@@ -21,13 +21,14 @@ public:
 	Console();
 	User login(string username, string password);
 	vector<Book> searchBook(map<string, string> type);
-	//vector<User> searchUser(SearchType temp);
+	vector<User> searchUser(map<string, string> type);
 	bool addBook(Book book);
-	bool addUser(User user);
+	bool addUser(User user, string username, string password);
 	bool updateUser(User user);
 	bool updateBook(Book book);
 	bool borrowBook(Book book, User user);
 	bool returnBook(Book book);
+	int getFine(Book book);
 	void exit();
 };
 

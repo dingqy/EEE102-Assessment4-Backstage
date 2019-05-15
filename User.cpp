@@ -2,12 +2,12 @@
 #include <iostream>
 #include <string>
 
-User::User(int id, string name, string gender) {
+User::User(int id, string name, string gender, int bookBorrow) {
 	this->id = id;
 	this->name = name;
 	this->gender = gender;
-	this->empty = false;
 	this->permission = 0;
+	this->bookBorrow = bookBorrow;
 }
 
 int User::getId() {
@@ -20,6 +20,14 @@ string User::getName() {
 
 string User::getGender() {
 	return gender;
+}
+
+int User::getBookBorrow() {
+	return bookBorrow;
+}
+
+int User::getBookReserve() {
+	return bookReserve;
 }
 
 void User::setId(int id) {
@@ -38,18 +46,42 @@ int User::getPermission() {
 	return permission;
 }
 
-Admin::Admin(int id, string name, string gender) {
+bool User::isFull() {
+	return false;
+}
+
+Admin::Admin(int id, string name, string gender, int bookborrow) {
 	this->id = id;
 	this->name = name;
 	this->gender = gender;
 	this->empty = false;
 	this->permission = 1;
+	this->bookBorrow = bookborrow;
 }
 
-Student::Student(int id, string name, string gender) {
+bool Admin::isFull() {
+	return true;
+}
+
+Student::Student(int id, string name, string gender, int bookborrow) {
 	this->id = id;
 	this->name = name;
 	this->gender = gender;
 	this->empty = false;
 	this->permission = 2;
+}
+
+Staff::Staff(int id, string name, string gender, int bookborrow) {
+	this->id = id;
+	this->name = name;
+	this->gender = gender;
+	this->permission = 3;
+}
+
+bool Student::isFull() {
+	return this->bookBorrow >= 6;
+}
+
+bool Staff::isFull() {
+	return this->bookBorrow >= 30;
 }

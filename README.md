@@ -7,6 +7,16 @@ Library Management System
 Visual Studio 2019
 
 ## Update
+### Version 1.0.0
+#### Date: 2019 / 05 / 15
+* Fix some bugs
+* searchUser() can be used now
+* Login() will create different User according to the permission in the database
+* Each user has their own limit of borrowing books
+* User class has a new child: Staff
+* getFine() can be used to get whether the user have to pay for the delay of returning books
+* Book now has a new attribute: price (The price of the book)
+
 ### Version 0.2.0
 #### Date: 2019 / 05 / 09
 * Fix some bugs and simplify some code

@@ -5,7 +5,7 @@ bool sqlExecute(string sqlTemp, sqlite3* db) {
 	char* zErrMsg = 0;
 	int res = sqlite3_exec(db, sqlTemp.c_str(), 0, 0, &zErrMsg);
 	if (res == SQLITE_OK) {
-		cout << "success";
+		cout << "success" << endl;
 		return true;
 	} else {
 		cout << "fail:" << zErrMsg << endl;
@@ -15,16 +15,13 @@ bool sqlExecute(string sqlTemp, sqlite3* db) {
 }
 
 //Get specfic dates
-string getTime() {
+string getDueTime() {
 	//%H:%M:%S	
 	time_t second;
 	time(&second);
-
+	second += 3600 * 24 * 30;
 	tm localTm;
 	localtime_s(&localTm, &second);
-
-	localTm.tm_mon += 1;
-	localTm.tm_mday = 28;
 
 	char localTimeStr[128] = { 0 };
 	strftime(localTimeStr, sizeof(localTimeStr), "%F", &localTm);
@@ -42,13 +39,15 @@ Console::Console() {
 	}
 }
 
-//Login the system
+//Login the system (Username should be unique)
 User Console::login(string username, string password) {
 	ostringstream ostr1;
-	ostr1 << "SELECT Id, Name, Gender FROM User WHERE " << "Username = '" << username << "' AND Password = '" << password << "';";
+	ostr1 << "SELECT Id, Name, Gender, bookBorrow, Permission FROM User WHERE " << "Username = '" << username << "' AND Password = '" << password << "';";
 	int id = 0;
 	string name;
 	string gender;
+	int permission = 0;
+	int booknumber = 0;
 	char* errmsg;
 	char** pResult;
 	int nRow;
@@ -64,22 +63,33 @@ User Console::login(string username, string password) {
 		return User();
 	}
 	int index = nCol;
-	for (int i = 0; i < nRow; i++) {
-		id = atoi(pResult[index]);
-		index++;
-		name = pResult[index];
-		index++;
-		gender = pResult[index];
-		index++;
+	id = atoi(pResult[index]);
+	index++;
+	name = pResult[index];
+	index++;
+	gender = pResult[index];
+	index++;
+	booknumber = atoi(pResult[index]);
+	index++;
+	permission = atoi(pResult[index]);
+	index++;
+	switch (permission) {
+	case 1:
+		return Admin(id, name, gender, booknumber);
+	case 2:
+		return Student(id, name, gender, booknumber);
+	case 3:
+		return Staff(id, name, gender, booknumber);
+	default:
+		return User();
 	}
-	return Admin(id, name, gender);
 }
 
 //Search the books from database (Name should be the first)
 vector<Book> Console::searchBook(map<string, string> type) {
 	vector<Book> result;
 	ostringstream ostr1;
-	ostr1 << "SELECT Name, Author, Publisher, BookId, BookCondition, dueTime FROM Book";
+	ostr1 << "SELECT Name, Author, Publisher, BookId, BookCondition, dueTime, Price FROM Book";
 	if (!type.empty()) {
 		ostr1 << " WHERE";
 		map<string, string>::iterator iter = type.begin();
@@ -94,6 +104,7 @@ vector<Book> Console::searchBook(map<string, string> type) {
 	string name;
 	string author;
 	string publisher;
+	double price;
 	int bookId;
 	string bookCondition;
 	string dueTime;
@@ -123,7 +134,55 @@ vector<Book> Console::searchBook(map<string, string> type) {
 		index++;
 		dueTime = pResult[index];
 		index++;
-		result.push_back(Book(name, author, publisher, bookId, bookCondition, dueTime));
+		price = atof(pResult[index]);
+		index++;
+		result.push_back(Book(name, author, publisher, bookId, bookCondition, dueTime, price));
+	}
+	return result;
+}
+
+vector<User> Console::searchUser(map<string, string> type) {
+	vector<User> result;
+	ostringstream ostr1;
+	ostr1 << "SELECT Id, Name, Gender, bookBorrow FROM User";
+	if (!type.empty()) {
+		ostr1 << " WHERE";
+		map<string, string>::iterator iter = type.begin();
+		ostr1 << " " << iter->first << " LIKE '%" << iter->second << "%";
+		iter++;
+		while (iter != type.end()) {
+			ostr1 << "'AND " << iter->first << " = '" << iter->second;
+			iter++;
+		}
+		ostr1 << "';";
+	}
+	string name;
+	int id;
+	string gender;
+	int booknumber;
+	string temp = ostr1.str();
+	char* errmsg;
+	char** pResult;
+	int nRow;
+	int nCol;
+	int nResult = sqlite3_get_table(db, ostr1.str().c_str(), &pResult, &nRow, &nCol, &errmsg);
+	if (nResult != SQLITE_OK) {
+		sqlite3_close(db);
+		cout << errmsg << endl;
+		sqlite3_free(errmsg);
+		return result;
+	}
+	int index = nCol;
+	for (int i = 0; i < nRow; i++) {
+		id = atoi(pResult[index]);
+		index++;
+		name = pResult[index];
+		index++;
+		gender = pResult[index];
+		index++;
+		booknumber = atoi(pResult[index]);
+		index++;
+		result.push_back(User(id, name, gender, booknumber));
 	}
 	return result;
 }
@@ -133,22 +192,22 @@ bool Console::addBook(Book book) {
 	ostringstream ostr1;
 	ostr1 << "INSERT INTO BOOK VALUES ('" << book.getName() << "', '"
 		<< book.getAuthor() << "', '" << book.getPublisher() << "', " << book.getBookId() << ", '"
-		<< book.getBookCondition() << "', 0, '0');";
+		<< book.getBookCondition() << "', 0, '0', 0.0);";
 	return sqlExecute(ostr1.str(), db);
 }
 
 //Add the user to the database
-bool Console::addUser(User user) {
+bool Console::addUser(User user, string username, string password) {
 	ostringstream ostr1;
 	ostr1 << "INSERT INTO User VALUES (" << user.getId() << ", '"
-		<< user.getName() << "', '" << user.getGender() << "');";
+		<< user.getName() << "', '" << user.getGender() << "', '" << username << "', '" << password << "', 0, 0, " << user.getPermission() << ");";
 	return sqlExecute(ostr1.str(), db);
 }
 
 //Update the user in the database
 bool Console::updateUser(User user) {
 	ostringstream ostr1;
-	ostr1 << "UPDATE User SET Id =  " << user.getId() << ", Name = '"
+	ostr1 << "UPDATE User SET Name = '"
 		<< user.getName() << "', Gender = '" << user.getGender() << "' WHERE Id = " << user.getId() << ";";
 	return sqlExecute(ostr1.str(), db);
 }
@@ -163,6 +222,9 @@ bool Console::updateBook(Book book) {
 
 //User borrow the book (dueTime was next month 28)
 bool Console::borrowBook(Book book, User user) {
+	if (user.isFull()) {
+		return false;
+	}
 	ostringstream ostr1;
 	ostr1 << "SELECT * FROM Book WHERE BookId = " << book.getBookId() << " AND BookCondition = '" << "Stored';";
 	char* errmsg;
@@ -180,8 +242,12 @@ bool Console::borrowBook(Book book, User user) {
 		return false;
 	}
 	ostr1.str("");
-	ostr1 << "UPDATE Book SET bookCondition =  'On loan-due', borrowId = "<< user.getId() << ", dueTime = '" << getTime() << "' WHERE bookId = " << book.getBookId() << ";";
-	return sqlExecute(ostr1.str(), db);
+	ostr1 << "UPDATE Book SET bookCondition =  'On loan-due', borrowId = "<< user.getId() << ", dueTime = '" << getDueTime() << "' WHERE bookId = " << book.getBookId() << ";";
+	sqlExecute(ostr1.str(), db);
+	ostr1.str("");
+	ostr1 << "UPDATE User SET bookBorrow = '" << user.getBookBorrow() + 1 << "' WHERE Id = " << user.getId() << ";";
+	sqlExecute(ostr1.str(), db);
+	return true;
 }
 
 bool Console::returnBook(Book book) {
@@ -202,8 +268,45 @@ bool Console::returnBook(Book book) {
 		return false;
 	}
 	ostr1.str("");
+	ostr1 << "UPDATE User SET bookBorrow = bookBorrow - 1 WHERE User.Id = (SELECT borrowId FROM Book WHERE Book.bookId = " << book.getBookId() << ");";
+	sqlExecute(ostr1.str(), db);
+	ostr1.str("");
 	ostr1 << "UPDATE Book SET bookCondition =  'Stored', borrowId = 0, dueTime = '0' WHERE bookId = " << book.getBookId() << ";";
-	return sqlExecute(ostr1.str(), db);
+	sqlExecute(ostr1.str(), db);
+	return true;
+}
+
+//It should be call before returning the book
+int Console::getFine(Book book) {
+	time_t t2;
+	time_t t1;
+	time(&t2);
+	tm tm_t;
+	int year;
+	int month;
+	int day;
+	sscanf_s(book.getBorrowTime().c_str(), "%4d-%2d-%2d", &year, &month, &day);
+	tm_t.tm_year = year - 1900;
+	tm_t.tm_mon = month - 1;
+	tm_t.tm_mday = day;
+	tm_t.tm_hour = 0;
+	tm_t.tm_min = 0;
+	tm_t.tm_sec = 0;
+	tm_t.tm_isdst = 0;
+	t1 = mktime(&tm_t);
+	double temp = difftime(t2, t1);
+	if (temp > 0) {
+		long daysecond = 3600 * 24;
+		long temp2 = (long)(temp / daysecond) - 30;
+		if (temp2 > (long) book.getPrice()) {
+			return book.getPrice();
+		} else {
+			return temp2;
+		}
+
+	} else {
+		return 0;
+	}
 }
 
 //Exit the system

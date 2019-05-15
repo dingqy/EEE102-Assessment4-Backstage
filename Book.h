@@ -15,12 +15,13 @@ private:
 	string bookCondition;
 	string warehousingTime;
 	string borrowTime;
+	double price;
 public:
-	Book(string name, string author, string publisher, int bookId, string bookCondition, string dueTime);
-	Book(string name, string isbn, string author, string publisher, int bookId, string bookCondition, string warehousingTime, string borrowTime);
+	Book(string name, string author, string publisher, int bookId, string bookCondition, string dueTime, double price);
 	string getName();
 	string getIsbn();
 	string getAuthor();
+	double getPrice();
 	string getPublisher();
 	string getBookCondition();
 	string getWarehousingTime();
