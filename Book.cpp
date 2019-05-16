@@ -1,6 +1,6 @@
 #include "Book.h"
 
-Book::Book(string name, string author, string publisher, int bookId, string bookCondition, string dueTime, double price) {
+Book::Book(string name, string author, string publisher, string bookCondition, string dueTime, double price, int bookId) {
 	this->name = name;
 	this->author = author;
 	this->publisher = publisher;

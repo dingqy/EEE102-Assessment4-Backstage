@@ -17,7 +17,7 @@ private:
 	string borrowTime;
 	double price;
 public:
-	Book(string name, string author, string publisher, int bookId, string bookCondition, string dueTime, double price);
+	Book(string name, string author, string publisher, string bookCondition, string dueTime, double price, int bookId=0);
 	string getName();
 	string getIsbn();
 	string getAuthor();

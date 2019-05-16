@@ -16,7 +16,7 @@ protected:
 	
 public:
 	User() = default;
-	User(int id, string name, string gender, int bookBorrow);
+	User(int id, string name, string gender, int bookBorrow, int bookReverse);
 	int getId();
 	string getName();
 	string getGender();
@@ -28,23 +28,24 @@ public:
 	int getPermission();
 	bool empty = true;
 	virtual bool isFull();
+	bool isFullReverse();
 };
 
 class Admin : public User {
 public:
-	Admin(int id, string name, string gender, int bookborrow=0);
+	Admin(int id, string name, string gender, int bookborrow=0, int bookReverse=0);
 	bool isFull();
 };
 
 class Student : public User {
 public:
-	Student(int id, string name, string gender, int bookborrow=0);
+	Student(int id, string name, string gender, int bookborrow = 0, int bookReverse = 0);
 	bool isFull();
 };
 
 class Staff : public User {
 public:
-	Staff(int id, string name, string gender, int bookborrow=0);
+	Staff(int id, string name, string gender, int bookborrow=0, int bookReverse=0);
 	bool isFull();
 };
 

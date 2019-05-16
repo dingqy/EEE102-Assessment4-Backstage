@@ -7,6 +7,13 @@ Library Management System
 Visual Studio 2019
 
 ## Update
+### Version 1.1.0
+#### Date: 2019 / 05 / 16
+* Fix some bugs
+* reverseBook() can be used now
+* deleteBook() and deleteUser() can be used now
+* bookId will be added automatically
+
 ### Version 1.0.0
 #### Date: 2019 / 05 / 15
 * Fix some bugs

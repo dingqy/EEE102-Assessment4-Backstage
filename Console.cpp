@@ -136,7 +136,7 @@ vector<Book> Console::searchBook(map<string, string> type) {
 		index++;
 		price = atof(pResult[index]);
 		index++;
-		result.push_back(Book(name, author, publisher, bookId, bookCondition, dueTime, price));
+		result.push_back(Book(name, author, publisher, bookCondition, dueTime, price, bookId));
 	}
 	return result;
 }
@@ -144,7 +144,7 @@ vector<Book> Console::searchBook(map<string, string> type) {
 vector<User> Console::searchUser(map<string, string> type) {
 	vector<User> result;
 	ostringstream ostr1;
-	ostr1 << "SELECT Id, Name, Gender, bookBorrow FROM User";
+	ostr1 << "SELECT Id, Name, Gender, bookBorrow, bookReverse FROM User";
 	if (!type.empty()) {
 		ostr1 << " WHERE";
 		map<string, string>::iterator iter = type.begin();
@@ -160,6 +160,7 @@ vector<User> Console::searchUser(map<string, string> type) {
 	int id;
 	string gender;
 	int booknumber;
+	int bookreverse;
 	string temp = ostr1.str();
 	char* errmsg;
 	char** pResult;
@@ -182,7 +183,9 @@ vector<User> Console::searchUser(map<string, string> type) {
 		index++;
 		booknumber = atoi(pResult[index]);
 		index++;
-		result.push_back(User(id, name, gender, booknumber));
+		bookreverse = atoi(pResult[index]);
+		index++;
+		result.push_back(User(id, name, gender, booknumber, bookreverse));
 	}
 	return result;
 }
@@ -190,9 +193,9 @@ vector<User> Console::searchUser(map<string, string> type) {
 //Add the book to the database
 bool Console::addBook(Book book) {
 	ostringstream ostr1;
-	ostr1 << "INSERT INTO BOOK VALUES ('" << book.getName() << "', '"
-		<< book.getAuthor() << "', '" << book.getPublisher() << "', " << book.getBookId() << ", '"
-		<< book.getBookCondition() << "', 0, '0', 0.0);";
+	ostr1 << "INSERT INTO BOOK VALUES (null, '" << book.getName() << "', '"
+		<< book.getAuthor() << "', '" << book.getPublisher() << "', '"
+		<< book.getBookCondition() << "', 0, '0', " << book.getPrice() << ", 0);";
 	return sqlExecute(ostr1.str(), db);
 }
 
@@ -226,7 +229,7 @@ bool Console::borrowBook(Book book, User user) {
 		return false;
 	}
 	ostringstream ostr1;
-	ostr1 << "SELECT * FROM Book WHERE BookId = " << book.getBookId() << " AND BookCondition = '" << "Stored';";
+	ostr1 << "SELECT * FROM Book WHERE BookId = " << book.getBookId() << " AND BookCondition = '" << "Stored' AND (ReverseId = " << user.getId() << " OR ReverseId = 0);";
 	char* errmsg;
 	char** pResult;
 	int nRow;
@@ -242,7 +245,10 @@ bool Console::borrowBook(Book book, User user) {
 		return false;
 	}
 	ostr1.str("");
-	ostr1 << "UPDATE Book SET bookCondition =  'On loan-due', borrowId = "<< user.getId() << ", dueTime = '" << getDueTime() << "' WHERE bookId = " << book.getBookId() << ";";
+	ostr1 << "UPDATE User SET bookReverse = bookReverse - 1 WHERE User.Id = (SELECT ReverseId FROM Book WHERE Book.bookId = " << book.getBookId() << " AND ReverseId != 0); ";
+	sqlExecute(ostr1.str(), db);
+	ostr1.str("");
+	ostr1 << "UPDATE Book SET bookCondition =  'On loan-due', borrowId = "<< user.getId() << ", dueTime = '" << getDueTime() << "', ReverseId = 0 WHERE bookId = " << book.getBookId() << ";";
 	sqlExecute(ostr1.str(), db);
 	ostr1.str("");
 	ostr1 << "UPDATE User SET bookBorrow = '" << user.getBookBorrow() + 1 << "' WHERE Id = " << user.getId() << ";";
@@ -272,6 +278,49 @@ bool Console::returnBook(Book book) {
 	sqlExecute(ostr1.str(), db);
 	ostr1.str("");
 	ostr1 << "UPDATE Book SET bookCondition =  'Stored', borrowId = 0, dueTime = '0' WHERE bookId = " << book.getBookId() << ";";
+	sqlExecute(ostr1.str(), db);
+	return true;
+}
+
+//Delete the book
+bool Console::deleteBook(Book book) {
+	ostringstream ostr1;
+	ostr1 << "DELETE FROM Book WHERE BookId = " << book.getBookId() << ";";
+	return sqlExecute(ostr1.str(), db);
+}
+
+//Delete the user
+bool Console::deleteUser(User user) {
+	ostringstream ostr1;
+	ostr1 << "DELETE FROM User WHERE BookId = " << user.getId() << ";";
+	return sqlExecute(ostr1.str(), db);
+}
+
+bool Console::bookReverse(Book book, User user) {
+	if (user.isFullReverse()) {
+		return false;
+	}
+	ostringstream ostr1;
+	ostr1 << "SELECT * FROM Book WHERE BookId = " << book.getBookId() << " AND BookCondition = '" << "On loan-due' AND BorrowId != " << user.getId() << " AND ReverseId = 0" << ";";
+	char* errmsg;
+	char** pResult;
+	int nRow;
+	int nCol;
+	int nResult = sqlite3_get_table(db, ostr1.str().c_str(), &pResult, &nRow, &nCol, &errmsg);
+	if (nResult != SQLITE_OK) {
+		sqlite3_close(db);
+		cout << errmsg << endl;
+		sqlite3_free(errmsg);
+		return false;
+	}
+	if (nRow == 0) {
+		return false;
+	}
+	ostr1.str("");
+	ostr1 << "UPDATE User SET bookReverse = bookReverse + 1 WHERE User.Id = " << user.getId() << ";";
+	sqlExecute(ostr1.str(), db);
+	ostr1.str("");
+	ostr1 << "UPDATE Book SET ReverseId =  " << user.getId() << " WHERE bookId = " << book.getBookId() << ";";
 	sqlExecute(ostr1.str(), db);
 	return true;
 }
