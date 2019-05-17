@@ -16,7 +16,6 @@ using namespace std;
 class Console {
 private:
 	sqlite3* db;
-	int cache_BookId = 0;
 public:
 	Console();
 	User login(string username, string password);
@@ -29,8 +28,8 @@ public:
 	bool borrowBook(Book book, User user);
 	bool returnBook(Book book);
 	bool deleteBook(Book book);
-	bool deleteUser(User user);
-	bool bookReverse(Book book, User user);
+	bool deleteUser(Book book);
+	bool bookReserve(Book book, User user);
 	int getFine(Book book);
 	void exit();
 };

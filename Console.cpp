@@ -42,12 +42,13 @@ Console::Console() {
 //Login the system (Username should be unique)
 User Console::login(string username, string password) {
 	ostringstream ostr1;
-	ostr1 << "SELECT Id, Name, Gender, bookBorrow, Permission FROM User WHERE " << "Username = '" << username << "' AND Password = '" << password << "';";
+	ostr1 << "SELECT Id, Name, Gender, bookBorrow, bookReserve, Permission FROM User WHERE " << "Username = '" << username << "' AND Password = '" << password << "';";
 	int id = 0;
 	string name;
 	string gender;
 	int permission = 0;
 	int booknumber = 0;
+	int Reservenumber = 0;
 	char* errmsg;
 	char** pResult;
 	int nRow;
@@ -71,15 +72,17 @@ User Console::login(string username, string password) {
 	index++;
 	booknumber = atoi(pResult[index]);
 	index++;
+	Reservenumber = atoi(pResult[index]);
+	index++;
 	permission = atoi(pResult[index]);
 	index++;
 	switch (permission) {
 	case 1:
-		return Admin(id, name, gender, booknumber);
+		return Admin(id, name, gender, booknumber, Reservenumber);
 	case 2:
-		return Student(id, name, gender, booknumber);
+		return Student(id, name, gender, booknumber, Reservenumber);
 	case 3:
-		return Staff(id, name, gender, booknumber);
+		return Staff(id, name, gender, booknumber, Reservenumber);
 	default:
 		return User();
 	}
@@ -89,7 +92,7 @@ User Console::login(string username, string password) {
 vector<Book> Console::searchBook(map<string, string> type) {
 	vector<Book> result;
 	ostringstream ostr1;
-	ostr1 << "SELECT Name, Author, Publisher, BookId, BookCondition, dueTime, Price FROM Book";
+	ostr1 << "SELECT Name, Isbn, Author, Publisher, BookId, BookCondition, dueTime, Price FROM Book";
 	if (!type.empty()) {
 		ostr1 << " WHERE";
 		map<string, string>::iterator iter = type.begin();
@@ -104,6 +107,7 @@ vector<Book> Console::searchBook(map<string, string> type) {
 	string name;
 	string author;
 	string publisher;
+	string isbn;
 	double price;
 	int bookId;
 	string bookCondition;
@@ -124,6 +128,8 @@ vector<Book> Console::searchBook(map<string, string> type) {
 	for (int i = 0; i < nRow; i++) {
 		name = pResult[index];
 		index++;
+		isbn = pResult[index];
+		index++;
 		author = pResult[index];
 		index++;
 		publisher = pResult[index];
@@ -136,7 +142,7 @@ vector<Book> Console::searchBook(map<string, string> type) {
 		index++;
 		price = atof(pResult[index]);
 		index++;
-		result.push_back(Book(name, author, publisher, bookCondition, dueTime, price, bookId));
+		result.push_back(Book(name, isbn, author, publisher, bookCondition, price, bookId, dueTime));
 	}
 	return result;
 }
@@ -144,14 +150,14 @@ vector<Book> Console::searchBook(map<string, string> type) {
 vector<User> Console::searchUser(map<string, string> type) {
 	vector<User> result;
 	ostringstream ostr1;
-	ostr1 << "SELECT Id, Name, Gender, bookBorrow, bookReverse FROM User";
+	ostr1 << "SELECT Id, Name, Gender, bookBorrow, bookReserve FROM User";
 	if (!type.empty()) {
 		ostr1 << " WHERE";
 		map<string, string>::iterator iter = type.begin();
 		ostr1 << " " << iter->first << " LIKE '%" << iter->second << "%";
 		iter++;
 		while (iter != type.end()) {
-			ostr1 << "'AND " << iter->first << " = '" << iter->second;
+			ostr1 << "'AND " << iter->first << " LIKE '%" << iter->second << "%";
 			iter++;
 		}
 		ostr1 << "';";
@@ -160,7 +166,7 @@ vector<User> Console::searchUser(map<string, string> type) {
 	int id;
 	string gender;
 	int booknumber;
-	int bookreverse;
+	int bookReserve;
 	string temp = ostr1.str();
 	char* errmsg;
 	char** pResult;
@@ -183,9 +189,9 @@ vector<User> Console::searchUser(map<string, string> type) {
 		index++;
 		booknumber = atoi(pResult[index]);
 		index++;
-		bookreverse = atoi(pResult[index]);
+		bookReserve = atoi(pResult[index]);
 		index++;
-		result.push_back(User(id, name, gender, booknumber, bookreverse));
+		result.push_back(User(id, name, gender, booknumber, bookReserve));
 	}
 	return result;
 }
@@ -195,7 +201,7 @@ bool Console::addBook(Book book) {
 	ostringstream ostr1;
 	ostr1 << "INSERT INTO BOOK VALUES (null, '" << book.getName() << "', '"
 		<< book.getAuthor() << "', '" << book.getPublisher() << "', '"
-		<< book.getBookCondition() << "', 0, '0', " << book.getPrice() << ", 0);";
+		<< book.getBookCondition() << "', 0, '0', " << book.getPrice() << ", 0" << ", '" << book.getIsbn() << "');";
 	return sqlExecute(ostr1.str(), db);
 }
 
@@ -218,8 +224,8 @@ bool Console::updateUser(User user) {
 //Update the book in the database
 bool Console::updateBook(Book book) {
 	ostringstream ostr1;
-	ostr1 << "UPDATE Book SET Name =  '" << book.getName() << "', Author = '" 
-		<< book.getAuthor() << "', Publisher = '" << book.getPublisher() << "' WHERE bookId = " << book.getBookId() << ";";
+	ostr1 << "UPDATE Book SET Name =  '" << book.getName() << "', Isbn = '" << book.getIsbn() << "', Author = '" 
+		<< book.getAuthor() << "', Publisher = '" << book.getPublisher() <<  "', Price = " << book.getPrice() << " WHERE bookId = " << book.getBookId() << ";";
 	return sqlExecute(ostr1.str(), db);
 }
 
@@ -229,7 +235,7 @@ bool Console::borrowBook(Book book, User user) {
 		return false;
 	}
 	ostringstream ostr1;
-	ostr1 << "SELECT * FROM Book WHERE BookId = " << book.getBookId() << " AND BookCondition = '" << "Stored' AND (ReverseId = " << user.getId() << " OR ReverseId = 0);";
+	ostr1 << "SELECT * FROM Book WHERE BookId = " << book.getBookId() << " AND BookCondition = '" << "Stored' AND (ReserveId = " << user.getId() << " OR ReserveId = 0);";
 	char* errmsg;
 	char** pResult;
 	int nRow;
@@ -245,10 +251,10 @@ bool Console::borrowBook(Book book, User user) {
 		return false;
 	}
 	ostr1.str("");
-	ostr1 << "UPDATE User SET bookReverse = bookReverse - 1 WHERE User.Id = (SELECT ReverseId FROM Book WHERE Book.bookId = " << book.getBookId() << " AND ReverseId != 0); ";
+	ostr1 << "UPDATE User SET bookReserve = bookReserve - 1 WHERE User.Id = (SELECT ReserveId FROM Book WHERE Book.bookId = " << book.getBookId() << " AND ReserveId != 0); ";
 	sqlExecute(ostr1.str(), db);
 	ostr1.str("");
-	ostr1 << "UPDATE Book SET bookCondition =  'On loan-due', borrowId = "<< user.getId() << ", dueTime = '" << getDueTime() << "', ReverseId = 0 WHERE bookId = " << book.getBookId() << ";";
+	ostr1 << "UPDATE Book SET bookCondition =  'On loan-due', borrowId = "<< user.getId() << ", dueTime = '" << getDueTime() << "', ReserveId = 0 WHERE bookId = " << book.getBookId() << ";";
 	sqlExecute(ostr1.str(), db);
 	ostr1.str("");
 	ostr1 << "UPDATE User SET bookBorrow = '" << user.getBookBorrow() + 1 << "' WHERE Id = " << user.getId() << ";";
@@ -290,18 +296,18 @@ bool Console::deleteBook(Book book) {
 }
 
 //Delete the user
-bool Console::deleteUser(User user) {
+bool Console::deleteUser(Book book) {
 	ostringstream ostr1;
-	ostr1 << "DELETE FROM User WHERE BookId = " << user.getId() << ";";
+	ostr1 << "DELETE FROM User WHERE Id = " << book.getBookId() << ";";
 	return sqlExecute(ostr1.str(), db);
 }
 
-bool Console::bookReverse(Book book, User user) {
-	if (user.isFullReverse()) {
+bool Console::bookReserve(Book book, User user) {
+	if (user.isFullReserve()) {
 		return false;
 	}
 	ostringstream ostr1;
-	ostr1 << "SELECT * FROM Book WHERE BookId = " << book.getBookId() << " AND BookCondition = '" << "On loan-due' AND BorrowId != " << user.getId() << " AND ReverseId = 0" << ";";
+	ostr1 << "SELECT * FROM Book WHERE BookId = " << book.getBookId() << " AND BookCondition = '" << "On loan-due' AND BorrowId != " << user.getId() << " AND ReserveId = 0" << ";";
 	char* errmsg;
 	char** pResult;
 	int nRow;
@@ -317,10 +323,10 @@ bool Console::bookReverse(Book book, User user) {
 		return false;
 	}
 	ostr1.str("");
-	ostr1 << "UPDATE User SET bookReverse = bookReverse + 1 WHERE User.Id = " << user.getId() << ";";
+	ostr1 << "UPDATE User SET bookReserve = bookReserve + 1 WHERE User.Id = " << user.getId() << ";";
 	sqlExecute(ostr1.str(), db);
 	ostr1.str("");
-	ostr1 << "UPDATE Book SET ReverseId =  " << user.getId() << " WHERE bookId = " << book.getBookId() << ";";
+	ostr1 << "UPDATE Book SET ReserveId =  " << user.getId() << " WHERE bookId = " << book.getBookId() << ";";
 	sqlExecute(ostr1.str(), db);
 	return true;
 }

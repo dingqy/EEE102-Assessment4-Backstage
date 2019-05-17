@@ -1,6 +1,6 @@
 #include "Book.h"
 
-Book::Book(string name, string author, string publisher, string bookCondition, string dueTime, double price, int bookId) {
+Book::Book(string name, string isbn, string author, string publisher, string bookCondition, double price, int bookId, string dueTime) {
 	this->name = name;
 	this->author = author;
 	this->publisher = publisher;
@@ -8,6 +8,7 @@ Book::Book(string name, string author, string publisher, string bookCondition, s
 	this->bookCondition = bookCondition;
 	this->borrowTime = dueTime;
 	this->price = price;
+	this->isbn = isbn;
 }
 
 string Book::getName() {

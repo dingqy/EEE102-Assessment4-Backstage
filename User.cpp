@@ -2,13 +2,22 @@
 #include <iostream>
 #include <string>
 
-User::User(int id, string name, string gender, int bookBorrow, int bookReverse) {
+User::User(string name, string gender, int bookBorrow, int bookReserve) {
+	this->name = name;
+	this->gender = gender;
+	this->permission = 0;
+	this->bookBorrow = bookBorrow;
+	this->bookReserve = bookReserve;
+	this->id = 0;
+}
+
+User::User(int id, string name, string gender, int bookBorrow, int bookReserve) {
 	this->id = id;
 	this->name = name;
 	this->gender = gender;
 	this->permission = 0;
 	this->bookBorrow = bookBorrow;
-	this->bookReserve = bookReverse;
+	this->bookReserve = bookReserve;
 }
 
 int User::getId() {
@@ -31,6 +40,14 @@ int User::getBookReserve() {
 	return bookReserve;
 }
 
+void User::addBookBorrow(int borrow) {
+	this->bookBorrow += borrow;
+}
+
+void User::addBookReserve(int reserve) {
+	this->bookReserve += reserve;
+}
+
 void User::setId(int id) {
 	this->id = id;
 }
@@ -51,39 +68,37 @@ bool User::isFull() {
 	return false;
 }
 
-bool User::isFullReverse() {
+bool User::isFullReserve() {
 	return this->bookReserve > 3;
 }
 
-Admin::Admin(int id, string name, string gender, int bookborrow, int bookReverse) {
+Admin::Admin(int id, string name, string gender, int bookborrow, int bookReserve) {
 	this->id = id;
 	this->name = name;
 	this->gender = gender;
-	this->empty = false;
 	this->permission = 1;
 	this->bookBorrow = bookborrow;
-	this->bookReserve = bookReverse;
+	this->bookReserve = bookReserve;
 }
 
 bool Admin::isFull() {
 	return true;
 }
 
-Student::Student(int id, string name, string gender, int bookborrow, int bookReverse) {
+Student::Student(int id, string name, string gender, int bookborrow, int bookReserve) {
 	this->id = id;
 	this->name = name;
 	this->gender = gender;
-	this->empty = false;
 	this->permission = 2;
-	this->bookReserve = bookReverse;
+	this->bookReserve = bookReserve;
 }
 
-Staff::Staff(int id, string name, string gender, int bookborrow, int bookReverse) {
+Staff::Staff(int id, string name, string gender, int bookborrow, int bookReserve) {
 	this->id = id;
 	this->name = name;
 	this->gender = gender;
 	this->permission = 3;
-	this->bookReserve = bookReverse;
+	this->bookReserve = bookReserve;
 }
 
 bool Student::isFull() {

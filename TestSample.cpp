@@ -6,61 +6,76 @@
 
 using namespace std;
 
+void addBook() {
+	Console temp = Console();
+	Book book1 = Book("Algorithms", "0", "Wayne", "Princeton", "Stored", 40.0);
+	temp.addBook(book1);
+	Book book2 = Book("Modern Semiconductor Devices for Integrated Circuits", "978-7-03-032665-2", "Chengming Hu", "Beijing", "Stored", 88.0);
+	temp.addBook(book2);
+	temp.exit();
+}
 
+void addUser() {
+	Console temp = Console();
+	Admin adm1 = Admin(1716584, "Admin1", "Male");
+	temp.addUser(adm1, "admin", "password");
+	temp.exit();
+}
+
+void borrowBook() {
+	Console temp;
+	User usr1 = temp.login("dingqy100", "dingqy123");
+	map<string, string> type;
+	type["Name"] = "Semiconductor";
+	vector<Book> booksearch1 = temp.searchBook(type);
+	temp.borrowBook(booksearch1[0], usr1);
+	temp.exit();
+}
+
+void returnBook() {
+	Console temp;
+	map<string, string> type;
+	type["Name"] = "Semiconductor";
+	vector<Book> booksearch1 = temp.searchBook(type);
+	temp.returnBook(booksearch1[0]);
+	temp.exit();
+}
+
+void ReserveBook() {
+	Console temp;
+	User usr1 = temp.login("admin", "password");
+	map<string, string> type;
+	type["Name"] = "Semiconductor";
+	vector<Book> booksearch1 = temp.searchBook(type);
+	temp.bookReserve(booksearch1[0], usr1);
+	temp.exit();
+}
+
+void Reserve_borrow() {
+	Console temp;
+	map<string, string> type;
+	User usr1 = temp.login("dingqy", "123123");
+	type["Name"] = "Semiconductor";
+	vector<Book> booksearch1 = temp.searchBook(type);
+	temp.returnBook(booksearch1[0]);
+	temp.borrowBook(booksearch1[0], usr1);
+}
+
+void getFine() {
+	Console temp;
+	map<string, string> type;
+	User usr1 = temp.login("dingqy", "123123");
+	type["Name"] = "Semiconductor";
+	vector<Book> booksearch1 = temp.searchBook(type);
+	cout << temp.getFine(booksearch1[0]);
+}
 
 int main() {
-	User user1 = User();
-	Console temp = Console();
-	Book temp2 = Book("Algorithms", "Wayne", "Princeton", 1, "Stored", "0", 40.0);
-	temp.addBook(temp2);
-	temp2 = Book("Computer Systems12", "Patt", "UTAustin", 3, "Stored", "0", 40.0);
-	temp.addBook(temp2);
-	map<string, string> temp3;
-	temp3["Name"] = "Computer";
-	vector<Book> temp4 = temp.searchBook(temp3);
-	cout <<  temp4[0].getName() << " " << temp4[0].getBorrowTime() << endl;
-	map<string, string> temp6;
-	vector<User> temp5 = temp.searchUser(temp6);
-	cout << temp5[0].getName() << " " << temp5[0].getGender() << endl;
-	Student stu1 = Student(1717573, "dingqy144", "Male");
-	temp.addUser(stu1, "dingqy100", "dingqy123");
-
-	if (temp.login("dingqy", "12123").empty) {
-		cout << "No user / Wrong input" << endl;
-	} else {
-		cout << "Log in successfully" << endl;
-	}
-	user1 = temp.login("dingqy", "123123");
-	if (!temp.borrowBook(temp2, user1)) {
-		cout << "Can not borrow" << endl;
-	}
-	cout << temp.getFine(temp4[1]) << endl;
-	//temp.returnBook(temp2);
-	temp.exit();
-	/*sqlite3* db;
-	int res = sqlite3_open("test.db", &db);
-	if (res != SQLITE_OK) {
-		cout << "fail!" << sqlite3_errmsg(db) << endl;
-		return 0;
-	} else {
-		cout << "success" << endl;
-	}
-
-	char sql[] = "CREATE TABLE COMPANY("  \
-		"ID INT PRIMARY KEY     NOT NULL," \
-		"NAME           TEXT    NOT NULL," \
-		"AGE            INT     NOT NULL," \
-		"ADDRESS        CHAR(50)," \
-		"SALARY         REAL );";
-	char* zErrMsg = 0;
-	res = sqlite3_exec(db, sql, 0, 0, &zErrMsg);
-	if (res == SQLITE_OK) {
-		cout << "success";
-	} else {
-		cout << "fail:" << zErrMsg << endl;
-		sqlite3_free(zErrMsg);
-	}
-
-	sqlite3_close(db);*/
-
+	//addBook();
+	//addUser();
+	returnBook();
+	//ReserveBook();
+	borrowBook();
+	getFine();
+	//Reserve_borrow();
 }
