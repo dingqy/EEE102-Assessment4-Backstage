@@ -97,7 +97,7 @@ Name, Isbn, Author, Publisher, BookId, BookCondition, dueTime, Price, ReserveId 
 * Input information (map<string, string>): <br>
 Name, Author, Publisher, bookCondition (Stored, On loan-due), borrowId, ReserveId <br>
 Example: type["Name"] = "Computer" <br>
-Notice: All the input attributes can be vague and can be chosen according to the requirements.
+* Notice: All the input attributes can be vague and can be chosen according to the requirements.
 
 #### 9. vector<User> searchUser (map<string, string> type)
 * Return vector<User> that contains all the users fulfill the requrements.
