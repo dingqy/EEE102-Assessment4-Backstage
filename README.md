@@ -89,7 +89,7 @@ Notice: "book: XXX" means these attributes will be used when executing.
 * The book returned in the vector contains all the detailed information
 #### 9. vector<User> searchUser (map<string, string> type)
 * Return vector<User> that contains all the book fulfill the requrements.
-* If no users fulfill the requirements, vector<Book> will be empty
+* If no users fulfill the requirements, vector<User> will be empty
 * Map has been built in the std library and it can be created directly.
 * The user returned in the vector contains all the detailed information except username and password.
 #### 10. bool bookReserve(Book book, User user)
