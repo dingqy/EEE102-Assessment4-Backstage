@@ -94,8 +94,8 @@ Notice: "book: XXX" means these attributes will be used when executing.
 * The book returned in the vector contains all the detailed information
 * Return information: <br>
 Name, Isbn, Author, Publisher, BookId, BookCondition, dueTime, Price, ReserveId (0: No one reserve)
-* Input information (map): <br>
-Name (String), Author (String), Publisher (String), bookCondition (Stored, On loan-due), borrowId (int), ReserveId (int) <br>
+* Input information (map<string, string>): <br>
+Name, Author, Publisher, bookCondition (Stored, On loan-due), borrowId, ReserveId <br>
 Example: type["Name"] = "Computer" <br>
 Notice: All the input attributes can be vague and can be chosen according to the requirements.
 
@@ -106,11 +106,11 @@ Notice: All the input attributes can be vague and can be chosen according to the
 * The user returned in the vector contains all the detailed information except username and password.
 * Return information: <br>
 Id, Name, Gender, bookBorrow, bookReserve
-* Input information (map): <br>
-Id (int), Name (String), Gender (String), bookReserve (unrecommended, int), bookBorrow (unrecommended, int), Permission (int) <br>
+* Input information (map<string, string>): <br>
+Id, Name, Gender, bookReserve, bookBorrow, Permission<br>
 Example: type["Name"] = "dingqy" <br>
-Notice: All the input attributes can be vague and can be chosen according to the requirements. <br>
-Notice: There may be some bugs. For instance, if you search the one who has borrowed 3 books, you may also get someone who borrow 13, 23. (It may not be fixed)
+* Notice: All the input attributes can be vague and can be chosen according to the requirements. <br>
+* Notice: There may be some bugs. For instance, if you search the one who has borrowed 3 books, you may also get someone who borrow 13, 23. (It may not be fixed)
 
 #### 10. bool bookReserve(Book book, User user)
 * Notice: When using this method, please firstly use searchBook() to get the bookId of the book
