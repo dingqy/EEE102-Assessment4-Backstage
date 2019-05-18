@@ -53,6 +53,7 @@ Visual Studio 2019 + SQLite + DB Brower for SQLite
 Notice: The program haven't passed the automatic unit test
 
 ## Class Function Introduction
+Notice: "book: XXX" means these attributes will be used when executing.
 ### Class Console
 #### 1. User login (string name, string password)
 * Return User whose permission is 0 if failing to log in
@@ -64,21 +65,21 @@ Notice: The program haven't passed the automatic unit test
 * user: Id, name, gender, permission
 * Return true if adding successfully
 #### 4. bool updateBook (Book book)
-* Notice: this method first need to use searchBook() to get the bookId of the book
+* Notice: When using this method, please firstly use searchBook() to get the bookId of the book
 * book: name, author, publisher, price, isbn
 * Return true if adding successfully
 #### 5. bool updateUser (User user)
-* Notice: this method first need to use searchUser() to get the Id of the user (Login is also available)
+* Notice: When using this method, please first use searchUser() to get the Id of the user (Login is also available but not recommended)
 * user: name, gender (It will be updated in the future)
 * Return true if adding successfully
 * This method cannot change the username and password.
 #### 6. bool borrowBook (Book book, User user)
-* Notice: this method first need to use searchBook() to get the bookId of the book
+* Notice: When using this method, please firstly use searchBook() to get the bookId of the book
 * book: bookId
 * user: Id
 * Return true if borrowing book successfully
 #### 7. bool returnBook (Book book)
-* Notice: this method first need to use searchBook() to get the bookId of the book
+* Notice: When using this method, please firstly use searchBook() to get the bookId of the book
 * book: bookId
 * Return true if returning book successfully
 #### 8. vector<Book> searchBook (map<string, string> type)
@@ -92,20 +93,22 @@ Notice: The program haven't passed the automatic unit test
 * Map has been built in the std library and it can be created directly.
 * The user returned in the vector contains all the detailed information except username and password.
 #### 10. bool bookReserve(Book book, User user)
-* Notice: this method first need to use searchBook() to get the bookId of the book
+* Notice: When using this method, please firstly use searchBook() to get the bookId of the book
 * Return true if book is reversed
 #### 11. bool deleteBook(Book book)
-* Notice: this method first need to use searchBook() to get the bookId of the book
+* Notice: When using this method, please firstly use searchBook() to get the bookId of the book
 * book: bookId
 * Return true if book is deleted
 #### 12. bool deleteUser(User user)
-* Notice: this method first need to use searchUser() to get the Id of the user (Should not use login())
+* Notice: When using this method, please firstly use searchUser() to get the Id of the user (Should not use login())
 * user: Id
 * Return true if user is deleted
 #### 13. int getFine(Book book)
-* Notice: this method first need to use searchBook() to get the bookId of the book
+* Notice: When using this method, please firstly use searchBook() to get the bookId of the book
 * This method should be used before return the book
 * Return integer of whether the book need to be paid for delay
+#### 14. void exit()
+* Close the sqlite
 ### Class User
 * addBookBorrow() and addBookReserve() should be used after Console.addBookBorrow() or Console.bookReserve()
 * Otherwise, you need to search or login the user again to get the newest information
