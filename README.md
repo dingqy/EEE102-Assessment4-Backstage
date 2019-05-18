@@ -11,8 +11,8 @@ Visual Studio 2019 + SQLite + DB Brower for SQLite
 2. Choose Adding the library
 3. Choose the second option and add the sqlite3.lib
 4. When adding the library, please do not choose the option like "Debug suffix d"
-5. Rebuild the program
-6. Change "test.db" into absolute path in the constructor of Console
+5. Change "test.db" into absolute path in the constructor of Console
+6. Rebuild the program
 
 ## Update
 ### Version 1.2.0
