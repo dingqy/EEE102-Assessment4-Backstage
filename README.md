@@ -110,5 +110,5 @@ Notice: "book: XXX" means these attributes will be used when executing.
 #### 14. void exit()
 * Close the sqlite
 ### Class User
-* addBookBorrow() and addBookReserve() should be used after Console.addBookBorrow() or Console.bookReserve()
+* addBookBorrow() and addBookReserve() should be used after Console.borrowBook() or Console.bookReserve() to trace the limitation of borrowing or reserving of one user (parameter: -1 / 1 is recommended)
 * Otherwise, you need to search or login the user again to get the newest information
