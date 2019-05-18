@@ -11,8 +11,8 @@ protected:
 	string name;
 	string gender;
 	int permission;
-	int bookBorrow;
-	int bookReserve;
+	int bookBorrow; // The number of books it has borrowed
+	int bookReserve; // The number of books it has reserved
 	
 public:
 	User() = default;

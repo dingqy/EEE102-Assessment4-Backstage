@@ -15,6 +15,11 @@ Visual Studio 2019 + SQLite + DB Brower for SQLite
 6. Rebuild the program
 
 ## Update
+### Version 1.3.0
+#### Date : 2019 / 05 / 18
+* Fix the bug that searchBook() will not return the information of ReserveId
+* Fix the bug that searchBook() only support the vague search of Name
+
 ### Version 1.2.0
 #### Date: 2019 / 05 / 17
 * Fix some bugs
@@ -83,15 +88,30 @@ Notice: "book: XXX" means these attributes will be used when executing.
 * book: bookId
 * Return true if returning book successfully
 #### 8. vector<Book> searchBook (map<string, string> type)
-* Return vector<Book> that contains all the book fulfill the requrements.
+* Return vector<Book> that contains all the books fulfill the requrements.
 * If no books fulfill the requirements, vector<Book> will be empty
 * Map has been built in the std library and it can be created directly.
 * The book returned in the vector contains all the detailed information
+* Return information: <br>
+Name, Isbn, Author, Publisher, BookId, BookCondition, dueTime, Price, ReserveId (0: No one reserve)
+* Input information (map): <br>
+Name (String), Author (String), Publisher (String), bookCondition (Stored, On loan-due), borrowId (int), ReserveId (int) <br>
+Example: type["Name"] = "Computer" <br>
+Notice: All the input attributes can be vague and can be chosen according to the requirements.
+
 #### 9. vector<User> searchUser (map<string, string> type)
-* Return vector<User> that contains all the book fulfill the requrements.
+* Return vector<User> that contains all the users fulfill the requrements.
 * If no users fulfill the requirements, vector<User> will be empty
 * Map has been built in the std library and it can be created directly.
 * The user returned in the vector contains all the detailed information except username and password.
+* Return information: <br>
+Id, Name, Gender, bookBorrow, bookReserve
+* Input information (map): <br>
+Id (int), Name (String), Gender (String), bookReserve (unrecommended, int), bookBorrow (unrecommended, int), Permission (int) <br>
+Example: type["Name"] = "dingqy" <br>
+Notice: All the input attributes can be vague and can be chosen according to the requirements. <br>
+Notice: There may be some bugs. For instance, if you search the one who has borrowed 3 books, you may also get someone who borrow 13, 23. (It may not be fixed)
+
 #### 10. bool bookReserve(Book book, User user)
 * Notice: When using this method, please firstly use searchBook() to get the bookId of the book
 * Return true if book is reversed
@@ -111,4 +131,4 @@ Notice: "book: XXX" means these attributes will be used when executing.
 * Close the sqlite
 ### Class User
 * addBookBorrow() and addBookReserve() should be used after Console.borrowBook() or Console.bookReserve() to trace the limitation of borrowing or reserving of one user (parameter: -1 / 1 is recommended)
-* Otherwise, you need to search or login the user again to get the newest information
+* Otherwise, you need to login the user again to get the newest information

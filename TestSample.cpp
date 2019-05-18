@@ -70,12 +70,20 @@ void getFine() {
 	cout << temp.getFine(booksearch1[0]);
 }
 
+void searchBook() {
+	Console temp;
+	map<string, string> type;
+	type["Publisher"] = "UT";
+	vector<Book> booksearch1 = temp.searchBook(type);
+	cout << booksearch1[0].getName() << " " << booksearch1[0].getReserveId();
+}
 int main() {
 	//addBook();
 	//addUser();
-	returnBook();
+	//returnBook();
 	//ReserveBook();
-	borrowBook();
-	getFine();
+	//borrowBook();
+	//getFine();
 	//Reserve_borrow();
+	searchBook();
 }

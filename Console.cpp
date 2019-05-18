@@ -92,14 +92,14 @@ User Console::login(string username, string password) {
 vector<Book> Console::searchBook(map<string, string> type) {
 	vector<Book> result;
 	ostringstream ostr1;
-	ostr1 << "SELECT Name, Isbn, Author, Publisher, BookId, BookCondition, dueTime, Price FROM Book";
+	ostr1 << "SELECT Name, Isbn, Author, Publisher, BookId, BookCondition, dueTime, Price, ReserveId FROM Book";
 	if (!type.empty()) {
 		ostr1 << " WHERE";
 		map<string, string>::iterator iter = type.begin();
 		ostr1 << " " << iter->first << " LIKE '%" << iter->second << "%";
 		iter ++;
 		while (iter != type.end()) {
-			ostr1 << "'AND " << iter->first << " = '" << iter->second;
+			ostr1 << "'AND " << iter->first << " LIKE '%" << iter->second << "%";
 			iter ++;
 		}
 		ostr1 << "';";
@@ -110,6 +110,7 @@ vector<Book> Console::searchBook(map<string, string> type) {
 	string isbn;
 	double price;
 	int bookId;
+	int reserveid;
 	string bookCondition;
 	string dueTime;
 	string temp = ostr1.str();
@@ -142,7 +143,9 @@ vector<Book> Console::searchBook(map<string, string> type) {
 		index++;
 		price = atof(pResult[index]);
 		index++;
-		result.push_back(Book(name, isbn, author, publisher, bookCondition, price, bookId, dueTime));
+		reserveid = atoi(pResult[index]);
+		index++;
+		result.push_back(Book(name, isbn, author, publisher, bookCondition, price, bookId, dueTime, reserveid));
 	}
 	return result;
 }

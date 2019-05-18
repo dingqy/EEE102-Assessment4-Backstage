@@ -14,10 +14,12 @@ private:
 	int bookId;
 	string bookCondition;
 	string warehousingTime; //Unused
-	string borrowTime;
+	string borrowTime; // It is dueTime
+	int reserveId;
 	double price;
 public:
-	Book(string name, string isbn, string author, string publisher, string bookCondition, double price, int bookId=0, string dueTime="0");
+	//Book(string name, string isbn, string author, string publisher, string bookCondition, double price, int reserveId, int bookId = 0, string dueTime = "0");
+	Book(string name, string isbn, string author, string publisher, string bookCondition, double price, int bookId=0, string dueTime="0", int reserveId=0);
 	string getName();
 	string getIsbn();
 	string getAuthor();
@@ -27,6 +29,7 @@ public:
 	string getWarehousingTime();
 	string getBorrowTime();
 	int getBookId();
+	int getReserveId();
 };
 
 #endif
