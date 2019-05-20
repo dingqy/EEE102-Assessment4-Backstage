@@ -15,6 +15,11 @@ Visual Studio 2019 + SQLite + DB Brower for SQLite
 6. Rebuild the program
 
 ## Update
+### Version 1.4.0
+* Add set methods to the class Book
+* Fix the bug that Error sql sentence will close the database
+* Follow the Google C++ style
+
 ### Version 1.3.0
 #### Date : 2019 / 05 / 18
 * Fix the bug that searchBook() will not return the information of ReserveId
