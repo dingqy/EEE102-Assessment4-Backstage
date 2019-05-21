@@ -12,9 +12,13 @@ Visual Studio 2019 + SQLite + DB Brower for SQLite
 3. Choose the second option and add the sqlite3.lib
 4. When adding the library, please do not choose the option like "Debug suffix d"
 5. Change "test.db" into absolute path in the constructor of Console
-6. Rebuild the program
+6. Change the uncomment "#include <unist.h>" and comment "#include <direct.h>"
+7. Rebuild the program
 
 ## Update
+### Version 1.5.0
+* Fix the bug that Qt (GCC) can not connect to test.db
+
 ### Version 1.4.0
 * Add set methods to the class Book
 * Fix the bug that Error sql sentence will close the database

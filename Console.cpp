@@ -3,8 +3,11 @@
 //
 
 #include "Console.h"
-#include <vector>
+#include <direct.h>  // Visual Studio <unist.h>
 #include <map>
+#include <vector>
+#include <sstream>
+// #include <unistd.h>
 #include <string>
 
 // Execute the sql sentences
@@ -38,12 +41,17 @@ string getDueTime() {
 
 // Open the sqlite3
 Console::Console() {
-  int res = sqlite3_open("test.db", &db);
+  char pathBuffer[_MAX_PATH];
+  _getcwd(pathBuffer, _MAX_PATH);
+  ostringstream temp;
+  temp << pathBuffer;
+  temp << "\\test.db";
+  int res = sqlite3_open(temp.str().c_str(), &db);
   if (res != SQLITE_OK) {
     cout << "fail!" << sqlite3_errmsg(db) << endl;
   } else {
     cout << "success" << endl;
-  } 
+  }
 }
 
 // Login the system (Username should be unique)
