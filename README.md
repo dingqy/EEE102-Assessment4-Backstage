@@ -17,15 +17,17 @@ Visual Studio 2019 + SQLite + DB Brower for SQLite
 
 ## Update
 ### Version 1.5.0
+#### Date: 2019 / 05 / 21
 * Fix the bug that Qt (GCC) can not connect to test.db
 
 ### Version 1.4.0
+#### Date: 2019 / 05 / 20
 * Add set methods to the class Book
 * Fix the bug that Error sql sentence will close the database
 * Follow the Google C++ style
 
 ### Version 1.3.0
-#### Date : 2019 / 05 / 18
+#### Date: 2019 / 05 / 18
 * Fix the bug that searchBook() will not return the information of ReserveId
 * Fix the bug that searchBook() only support the vague search of Name
 
