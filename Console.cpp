@@ -3,11 +3,8 @@
 //
 
 #include "Console.h"
-#include <direct.h>  // Visual Studio <unist.h>
 #include <map>
 #include <vector>
-#include <sstream>
-// #include <unistd.h>
 #include <string>
 
 // Execute the sql sentences
@@ -41,12 +38,7 @@ string getDueTime() {
 
 // Open the sqlite3
 Console::Console() {
-  char pathBuffer[_MAX_PATH];
-  _getcwd(pathBuffer, _MAX_PATH);
-  ostringstream temp;
-  temp << pathBuffer;
-  temp << "\\test.db";
-  int res = sqlite3_open(temp.str().c_str(), &db);
+  int res = sqlite3_open("./test.db", &db);
   if (res != SQLITE_OK) {
     cout << "fail!" << sqlite3_errmsg(db) << endl;
   } else {
