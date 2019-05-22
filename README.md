@@ -16,9 +16,10 @@ Visual Studio 2019 + SQLite + DB Brower for SQLite
 7. Rebuild the program
 
 ## Update
-### Version 1.7.0
+### Version 1.7.1
 #### Date: 2019 / 05 / 22
 * Fix the bug that deleteUser() has wrong parameter type
+* Fix the bug that isFull() and isFullReserve() cannot work
 ### Version 1.6.0
 #### Date: 2019 / 05 / 22
 * Fix the bug that Student and Staff will get error bookBorrow when loging or searching

@@ -27,9 +27,9 @@ void addUser() {
 
 void borrowBook() {
   Console temp;
-  User usr1 = temp.login("dingqy100", "dingqy123");
+  User* usr1 = temp.login("dingqy100", "dingqy123");
   map<string, string> type;
-  type["Name"] = "Semiconductor";
+  type["Name"] = "Algorithm";
   vector<Book> booksearch1 = temp.searchBook(type);
   temp.borrowBook(booksearch1[0], usr1);
   temp.exit();
@@ -46,7 +46,7 @@ void returnBook() {
 
 void ReserveBook() {
   Console temp;
-  User usr1 = temp.login("admin", "password");
+  User* usr1 = temp.login("admin", "password");
   map<string, string> type;
   type["Name"] = "Semiconductor";
   vector<Book> booksearch1 = temp.searchBook(type);
@@ -57,7 +57,7 @@ void ReserveBook() {
 void Reserve_borrow() {
   Console temp;
   map<string, string> type;
-  User usr1 = temp.login("dingqy", "123123");
+  User* usr1 = temp.login("dingqy", "123123");
   type["Name"] = "Semiconductor";
   vector<Book> booksearch1 = temp.searchBook(type);
   temp.returnBook(booksearch1[0]);
@@ -67,7 +67,7 @@ void Reserve_borrow() {
 void getFine() {
   Console temp;
   map<string, string> type;
-  User usr1 = temp.login("dingqy", "123123");
+  User* usr1 = temp.login("dingqy", "123123");
   type["Name"] = "Semiconductor";
   vector<Book> booksearch1 = temp.searchBook(type);
   cout << temp.getFine(booksearch1[0]);

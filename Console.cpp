@@ -31,7 +31,7 @@ string getDueTime() {
   localtime_s(&localTm, &second);
 
   char localTimeStr[128] = {0};
-  strftime(localTimeStr, sizeof(localTimeStr), "%F", &localTm);
+  strftime(localTimeStr, sizeof(localTimeStr), "%Y-%m-%d", &localTm);
 
   return localTimeStr;
 }
@@ -47,7 +47,7 @@ Console::Console() {
 }
 
 // Login the system (Username should be unique)
-User Console::login(string username, string password) {
+User* Console::login(string username, string password) {
   ostringstream ostr1;
   ostr1 << "SELECT Id, Name, Gender, bookBorrow, bookReserve, Permission FROM "
            "User WHERE "
@@ -69,10 +69,10 @@ User Console::login(string username, string password) {
     // sqlite3_close(db);
     cout << errmsg << endl;
     sqlite3_free(errmsg);
-    return User();
+    return new User();
   }
   if (nRow == 0) {
-    return User();
+    return new User();
   }
   int index = nCol;
   id = atoi(pResult[index]);
@@ -89,13 +89,13 @@ User Console::login(string username, string password) {
   index++;
   switch (permission) {
     case 1:
-      return Admin(id, name, gender, booknumber, Reservenumber);
+      return new Admin(id, name, gender, booknumber, Reservenumber);
     case 2:
-      return Student(id, name, gender, booknumber, Reservenumber);
+      return new Student(id, name, gender, booknumber, Reservenumber);
     case 3:
-      return Staff(id, name, gender, booknumber, Reservenumber);
+      return new Staff(id, name, gender, booknumber, Reservenumber);
     default:
-      return User();
+      return new User();
   }
 }
 
@@ -253,14 +253,14 @@ bool Console::updateBook(Book book) {
 }
 
 // User borrow the book (dueTime was next month 28)
-bool Console::borrowBook(Book book, User user) {
-  if (user.isFull()) {
+bool Console::borrowBook(Book book, User* user) {
+  if (user->isFull()) {
     return false;
   }
   ostringstream ostr1;
   ostr1 << "SELECT * FROM Book WHERE BookId = " << book.getBookId()
         << " AND BookCondition = '"
-        << "Stored' AND (ReserveId = " << user.getId() << " OR ReserveId = 0);";
+        << "Stored' AND (ReserveId = " << user->getId() << " OR ReserveId = 0);";
   char* errmsg;
   char** pResult;
   int nRow;
@@ -283,12 +283,12 @@ bool Console::borrowBook(Book book, User user) {
   sqlExecute(ostr1.str(), db);
   ostr1.str("");
   ostr1 << "UPDATE Book SET bookCondition =  'On loan-due', borrowId = "
-        << user.getId() << ", dueTime = '" << getDueTime()
+        << user->getId() << ", dueTime = '" << getDueTime()
         << "', ReserveId = 0 WHERE bookId = " << book.getBookId() << ";";
   sqlExecute(ostr1.str(), db);
   ostr1.str("");
-  ostr1 << "UPDATE User SET bookBorrow = '" << user.getBookBorrow() + 1
-        << "' WHERE Id = " << user.getId() << ";";
+  ostr1 << "UPDATE User SET bookBorrow = '" << user->getBookBorrow() + 1
+        << "' WHERE Id = " << user->getId() << ";";
   sqlExecute(ostr1.str(), db);
   return true;
 }
@@ -334,20 +334,20 @@ bool Console::deleteBook(Book book) {
 }
 
 // Delete the user
-bool Console::deleteUser(User user) {
+bool Console::deleteUser(Book book) {
   ostringstream ostr1;
-  ostr1 << "DELETE FROM User WHERE Id = " << user.getId() << ";";
+  ostr1 << "DELETE FROM User WHERE Id = " << book.getBookId() << ";";
   return sqlExecute(ostr1.str(), db);
 }
 
-bool Console::bookReserve(Book book, User user) {
-  if (user.isFullReserve()) {
+bool Console::bookReserve(Book book, User* user) {
+  if (user->isFullReserve()) {
     return false;
   }
   ostringstream ostr1;
   ostr1 << "SELECT * FROM Book WHERE BookId = " << book.getBookId()
         << " AND BookCondition = '"
-        << "On loan-due' AND BorrowId != " << user.getId()
+        << "On loan-due' AND BorrowId != " << user->getId()
         << " AND ReserveId = 0"
         << ";";
   char* errmsg;
@@ -367,10 +367,10 @@ bool Console::bookReserve(Book book, User user) {
   }
   ostr1.str("");
   ostr1 << "UPDATE User SET bookReserve = bookReserve + 1 WHERE User.Id = "
-        << user.getId() << ";";
+        << user->getId() << ";";
   sqlExecute(ostr1.str(), db);
   ostr1.str("");
-  ostr1 << "UPDATE Book SET ReserveId =  " << user.getId()
+  ostr1 << "UPDATE Book SET ReserveId =  " << user->getId()
         << " WHERE bookId = " << book.getBookId() << ";";
   sqlExecute(ostr1.str(), db);
   return true;
