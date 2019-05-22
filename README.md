@@ -148,3 +148,9 @@ Example: type["Name"] = "dingqy" <br>
 ### Class User
 * addBookBorrow() and addBookReserve() should be used after Console.borrowBook() or Console.bookReserve() to trace the limitation of borrowing or reserving of one user (parameter: -1 / 1 is recommended)
 * Otherwise, you need to login the user again to get the newest information
+
+* 当前用户借书，借书成功后需用addBookBorrow(1)，确保用户借书数量与实际相同
+* 当前用户还书，还书成功后需用addBookBorrow(-1)，，确保用户借书数量与实际相同
+* 当前用户预约， 预约成功需用addBookReserve(1)， 确保用户预约数量与实际相同
+* 若当前用户借阅其已预约过图书，除了上述操作，还需用addBookReserve(-1)，确保用户预约数量与实际相同
+* addBookBorrow() 和 addBookReserve() 禁止除了1，0，-1以外参数
