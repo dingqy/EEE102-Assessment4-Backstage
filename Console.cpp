@@ -334,9 +334,9 @@ bool Console::deleteBook(Book book) {
 }
 
 // Delete the user
-bool Console::deleteUser(Book book) {
+bool Console::deleteUser(User user) {
   ostringstream ostr1;
-  ostr1 << "DELETE FROM User WHERE Id = " << book.getBookId() << ";";
+  ostr1 << "DELETE FROM User WHERE Id = " << user.getId() << ";";
   return sqlExecute(ostr1.str(), db);
 }
 
