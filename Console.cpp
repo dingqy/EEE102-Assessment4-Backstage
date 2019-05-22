@@ -314,7 +314,7 @@ bool Console::returnBook(Book book) {
     return false;
   }
   ostr1.str("");
-  ostr1 << "UPDATE User SET bookBorrow = bookBorrow - 1"
+  ostr1 << "UPDATE User SET bookBorrow = bookBorrow - 1 "
            "WHERE User.Id = (SELECT borrowId FROM Book WHERE Book.bookId = "
         << book.getBookId() << ");";
   sqlExecute(ostr1.str(), db);

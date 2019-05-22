@@ -85,8 +85,9 @@ int main() {
   // addUser();
   // returnBook();
   // ReserveBook();
-  // borrowBook();
+  borrowBook();
   // getFine();
   // Reserve_borrow();
   //searchBook();
 }
+

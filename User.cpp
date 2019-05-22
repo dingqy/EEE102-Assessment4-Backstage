@@ -69,6 +69,7 @@ Student::Student(int id, string name, string gender, int bookborrow,
   this->name = name;
   this->gender = gender;
   this->permission = 2;
+  this->bookBorrow = bookborrow;
   this->bookReserve = bookReserve;
 }
 
@@ -77,6 +78,7 @@ Staff::Staff(int id, string name, string gender, int bookborrow,
   this->id = id;
   this->name = name;
   this->gender = gender;
+  this->bookBorrow = bookborrow;
   this->permission = 3;
   this->bookReserve = bookReserve;
 }

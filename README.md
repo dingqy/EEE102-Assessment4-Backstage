@@ -16,6 +16,11 @@ Visual Studio 2019 + SQLite + DB Brower for SQLite
 7. Rebuild the program
 
 ## Update
+### Version 1.6.0
+#### Date: 2019 / 05 / 22
+* Fix the bug that Student and Staff will get error bookBorrow when loging or searching
+* Fix the bug that bookBorrow() have an error sql sentence
+
 ### Version 1.5.0 (1.4.0 is also available)
 #### Date: 2019 / 05 / 21
 * Fix the bug that Qt (GCC) can not connect to test.db
