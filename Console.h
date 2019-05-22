@@ -35,7 +35,7 @@ class Console {
   bool borrowBook(Book book, User user);
   bool returnBook(Book book);
   bool deleteBook(Book book);
-  bool deleteUser(Book book);
+  bool deleteUser(User user);
   bool bookReserve(Book book, User user);
   int getFine(Book book);
   void exit();
