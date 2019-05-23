@@ -16,6 +16,9 @@ Visual Studio 2019 + SQLite + DB Brower for SQLite
 7. Rebuild the program
 
 ## Update
+### Version 1.7.2
+#### Date: 2019 / 05 / 23
+* Fix the bug that isFull() in Admin is wrong
 ### Version 1.7.1
 #### Date: 2019 / 05 / 22
 * Fix the bug that deleteUser() has wrong parameter type

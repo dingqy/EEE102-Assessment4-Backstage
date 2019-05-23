@@ -61,7 +61,7 @@ Admin::Admin(int id, string name, string gender, int bookborrow,
   this->bookReserve = bookReserve;
 }
 
-bool Admin::isFull() { return true; }
+bool Admin::isFull() { return false; }
 
 Student::Student(int id, string name, string gender, int bookborrow,
                  int bookReserve) {
