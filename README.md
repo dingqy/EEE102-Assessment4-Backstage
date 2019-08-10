@@ -1,4 +1,4 @@
-# EEE102 Spring 2019 Assessment 4
+# XJTLU EEE102 Spring 2019 Assessment 4
 
 ## Project Name
 Library Management System
